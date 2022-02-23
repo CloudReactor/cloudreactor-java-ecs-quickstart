@@ -1,13 +1,8 @@
-.DS_Store
-.idea/
-*.iml
-*.ipr
-*.iws
-
-.gradle/
-gradle.properties
-build/
-
 # Uncomment this line if you are committing encrypted secret
 # files to source control, with either ansible-vault or git-encrypt.
-# deploy_config/env
+# *
+
+!common.yml
+!dev.yml
+!example.yml
+*-dev.yml

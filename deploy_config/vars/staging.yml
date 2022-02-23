@@ -1,0 +1,23 @@
+cloudreactor:
+  run_environment: "simon-staging-us-east-1"
+
+default_env_task_config:
+  ecs:
+    platform_version: "1.4.0"
+  wrapper:
+    process_max_retries: 0
+    api_heartbeat_interval_seconds: 120
+    enable_status_update_listener: true
+    status_update_interval_seconds: 60
+  env:
+    DEPLOYMENT: "{{env}}"
+
+task_name_to_env_config:
+  main:
+    env:
+      SOME_ENV: SOME_VALUE
+  add:
+    env:
+      SOME_ENV: ANOTHER_VALUE
+    wrapper:
+      process_timeout_seconds: 10

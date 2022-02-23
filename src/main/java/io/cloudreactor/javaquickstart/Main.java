@@ -7,6 +7,19 @@ import io.cloudreactor.tasksymphony.wrapperio.TaskStatusUpdater;
 
 public class Main {
   public static void main(final String[] args) {
+    var taskName = "main";
+
+    if (args.length > 0) {
+      taskName = args[0];
+    }
+
+    switch (taskName) {
+      case "main" -> runMainTask();
+      case "add" -> runAdderTask();
+    }
+  }
+
+  static void runMainTask() {
     try (TaskStatusUpdater statusUpdater = new TaskStatusUpdater()) {
       statusUpdater.sendUpdateAndIgnoreError(
           0L,   // successCount
@@ -30,14 +43,27 @@ public class Main {
         );
       }
 
-     var result = add(5, 10);
-
       statusUpdater.sendUpdateAndIgnoreError(
           null, // successCount
           null, // errorCount
           null, // skippedCount
           null, // expectedCount
-          "Finished Java QuickStart app, result = " + result + "!", // lastStatusMessage
+          "Finished Java QuickStart app!", // lastStatusMessage
+          null  // extraProps
+      );
+    }
+  }
+
+  static void runAdderTask() {
+    var result = add(5, 10);
+
+    try (TaskStatusUpdater statusUpdater = new TaskStatusUpdater()) {
+      statusUpdater.sendUpdateAndIgnoreError(
+          null, // successCount
+          null, // errorCount
+          null, // skippedCount
+          null, // expectedCount
+          "Result = " + result, // lastStatusMessage
           null  // extraProps
       );
     }
