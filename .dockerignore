@@ -1,0 +1,11 @@
+.idea
+
+build
+
+Dockerfile
+docker-compose.yml
+.gitignore
+LICENSE.txt
+
+deploy_config
+!deploy_config/files

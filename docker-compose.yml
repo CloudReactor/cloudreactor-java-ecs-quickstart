@@ -1,0 +1,55 @@
+version: "3.9"
+
+x-common-base: &common-base
+  #env_file:
+  #  - .env.dclocal
+  environment: &dev-env
+    DEPLOYMENT: development
+  volumes:
+    - .:/home/appuser/app
+  profiles: ["development"]
+
+x-dev-base: &dev-base
+  <<: *common-base
+  image: cloudreactor-java-ecs-quickstart
+  build:
+    context: ./
+    target: development
+
+x-deployed-base: &deployed-base
+  <<: *common-base
+  image: cloudreactor-java-ecs-quickstart
+  entrypoint: java -jar app.jar
+
+services:
+  main:
+    <<: *dev-base
+    entrypoint: ./gradlew run
+
+  test:
+    <<: *dev-base
+    entrypoint: ./gradlew test
+
+  # Not a deployed task, here for debugging your Docker build.
+  dev-shell:
+    <<: *dev-base
+    entrypoint: bash
+
+  build-jar:
+    <<: *dev-base
+    entrypoint: ./gradlew shadowJar
+
+  deployed:
+    <<: *deployed-base
+    environment:
+      <<: *dev-env
+
+  # Check your Dockerfile against best-practices:
+  # See https://github.com/hadolint/hadolint
+  hadolint:
+    image: hadolint/hadolint
+    volumes:
+      - ./Dockerfile:/mnt/Dockerfile
+      - ./.hadolint.yaml:/mnt/.hadolint.yaml
+    command: /bin/hadolint --config /mnt/.hadolint.yaml /mnt/Dockerfile
+    profiles: ["development"]
