@@ -33,7 +33,7 @@ jobs:
         with:
           arguments: build
       - name: Deploy to AWS ECS and CloudReactor
-        uses: CloudReactor/aws-ecs-cloudreactor-deployer@v2.0.1
+        uses: CloudReactor/aws-ecs-cloudreactor-deployer@v2.0.2
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
