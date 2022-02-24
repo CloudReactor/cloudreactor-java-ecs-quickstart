@@ -16,7 +16,7 @@ task_name_to_env_config:
   main:
     env:
       SOME_ENV: SOME_VALUE
-  add:
+  adder:
     env:
       SOME_ENV: ANOTHER_VALUE
     wrapper:
