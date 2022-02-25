@@ -5,7 +5,16 @@ import org.slf4j.LoggerFactory;
 
 import io.cloudreactor.tasksymphony.wrapperio.TaskStatusUpdater;
 
-public class Main {
+/** The main class of this application, which demonstrates the use of the
+ *  task status updater.
+ */
+public final class Main {
+  private Main() { }
+
+  /** Entrypoint.
+   *
+   * @param args An array of command-line arguments.
+   */
   public static void main(final String[] args) {
     var taskName = "main";
 
@@ -16,6 +25,7 @@ public class Main {
     switch (taskName) {
       case "main" -> runMainTask();
       case "add" -> runAdderTask();
+      default -> throw new RuntimeException("Unknown task name: " + taskName);
     }
   }
 
@@ -30,7 +40,7 @@ public class Main {
           null  // extraProps
       );
 
-      logger.info("Hello!");
+      LOGGER.info("Hello!");
 
       for (long i = 0; i < 10; i++) {
         statusUpdater.sendUpdateAndIgnoreError(
@@ -69,9 +79,10 @@ public class Main {
     }
   }
 
-  static int add(int a, int b) {
+  static int add(final int a, final int b) {
     return a + b;
   }
 
-  private static final Logger logger = LoggerFactory.getLogger(Main.class);
+  /** Logger for this class. */
+  private static final Logger LOGGER = LoggerFactory.getLogger(Main.class);
 }
