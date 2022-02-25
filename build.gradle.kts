@@ -1,3 +1,4 @@
+import org.gradle.api.plugins.quality.Checkstyle
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 
 plugins {
@@ -32,6 +33,13 @@ application {
 tasks.getByName<Test>("test") {
   useJUnitPlatform()
 }
+
+tasks.getByName<Checkstyle>("checkstyleTest") {
+  sourceSets {
+    exclude("*")
+  }
+}
+
 
 tasks {
   named<ShadowJar>("shadowJar") {
