@@ -4,6 +4,11 @@ import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 plugins {
   java
   checkstyle
+
+  // Causes warnings about setSecurityManager
+  // https://github.com/spotbugs/spotbugs/issues/1579
+  id("com.github.spotbugs") version "5.0.6"
+
   application
   id("com.github.johnrengelman.shadow") version "7.1.2"
 }
