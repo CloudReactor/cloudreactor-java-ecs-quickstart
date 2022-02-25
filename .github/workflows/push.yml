@@ -32,6 +32,10 @@ jobs:
         uses: gradle/gradle-build-action@v2
         with:
           arguments: build
+      - name: Run source code linting with CheckStyle
+        uses: gradle/gradle-build-action@v2
+        with:
+          arguments: checkstyleMain
       - name: Deploy to AWS ECS and CloudReactor
         uses: CloudReactor/aws-ecs-cloudreactor-deployer@v2.0.3
         with:
