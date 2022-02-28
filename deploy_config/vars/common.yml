@@ -239,8 +239,12 @@ task_name_to_config:
   adder:
     command: "add"
     description: "Adds two numbers"
-    # schedule: cron(9 15 * * ? *)
-    # scheduled_instance_count: 1
+    wrapper:
+      <<: *default_task_wrapper
+      enable_status_update_listener: true
+  readsecret:
+    command: "readsecret"
+    description: "Reads a secret value from Secrets Manager"
     wrapper:
       <<: *default_task_wrapper
       enable_status_update_listener: true
