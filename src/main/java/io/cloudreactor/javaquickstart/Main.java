@@ -25,6 +25,7 @@ public final class Main {
     switch (taskName) {
       case "main" -> runMainTask();
       case "add" -> runAdderTask();
+      case "readsecret" -> readSecret();
       default -> throw new RuntimeException("Unknown task name: " + taskName);
     }
   }
@@ -32,34 +33,34 @@ public final class Main {
   static void runMainTask() {
     try (TaskStatusUpdater statusUpdater = new TaskStatusUpdater()) {
       statusUpdater.sendUpdateAndIgnoreError(
-          0L,   // successCount
-          null, // errorCount
-          null, // skippedCount
-          10L,  // expectedCount
-          "Starting Java QuickStart app ...", // lastStatusMessage
-          null  // extraProps
+        0L,   // successCount
+        null, // errorCount
+        null, // skippedCount
+        10L,  // expectedCount
+        "Starting Java QuickStart app ...", // lastStatusMessage
+        null  // extraProps
       );
 
       LOGGER.info("Hello!");
 
       for (long i = 0; i < 10; i++) {
         statusUpdater.sendUpdateAndIgnoreError(
-            i,    // successCount
-            null, // errorCount
-            null, // skippedCount
-            null, // expectedCount
-            "Updating row " + i + " ...", // lastStatusMessage
-            null  // extraProps
+          i,    // successCount
+          null, // errorCount
+          null, // skippedCount
+          null, // expectedCount
+          "Updating row " + i + " ...", // lastStatusMessage
+          null  // extraProps
         );
       }
 
       statusUpdater.sendUpdateAndIgnoreError(
-          null, // successCount
-          null, // errorCount
-          null, // skippedCount
-          null, // expectedCount
-          "Finished Java QuickStart app!", // lastStatusMessage
-          null  // extraProps
+        null, // successCount
+        null, // errorCount
+        null, // skippedCount
+        null, // expectedCount
+        "Finished Java QuickStart app!", // lastStatusMessage
+        null  // extraProps
       );
     }
   }
@@ -69,18 +70,35 @@ public final class Main {
 
     try (TaskStatusUpdater statusUpdater = new TaskStatusUpdater()) {
       statusUpdater.sendUpdateAndIgnoreError(
-          null, // successCount
-          null, // errorCount
-          null, // skippedCount
-          null, // expectedCount
-          "Result = " + result, // lastStatusMessage
-          null  // extraProps
+        null, // successCount
+        null, // errorCount
+        null, // skippedCount
+        null, // expectedCount
+        "Result = " + result, // lastStatusMessage
+        null  // extraProps
       );
     }
   }
 
   static int add(final int a, final int b) {
     return a + b;
+  }
+
+  static void readSecret() {
+    try (TaskStatusUpdater statusUpdater = new TaskStatusUpdater()) {
+      var secret = System.getenv("SECRET_VALUE");
+      var message = "Secret is " + secret;
+
+      System.out.println(message);
+      statusUpdater.sendUpdateAndIgnoreError(
+        null, // successCount
+        null, // errorCount
+        null, // skippedCount
+        null, // expectedCount
+        message, // lastStatusMessage
+        null  // extraProps
+      );
+    }
   }
 
   /** Logger for this class. */
