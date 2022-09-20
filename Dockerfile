@@ -27,7 +27,7 @@ ENV PYTHONPATH /home/appuser/app
 
 COPY deploy_config/files/proc_wrapper-requirements.txt .
 RUN pip3 install --no-input --no-cache-dir -r proc_wrapper-requirements.txt
-RUN pip3 install --no-input --no-cache-dir cloudreactor-procwrapper==3.1.2
+RUN pip3 install --no-input --no-cache-dir cloudreactor-procwrapper==5.0.0
 
 FROM base AS builder
 
@@ -52,7 +52,7 @@ FROM base AS release
 
 COPY --from=builder /home/appuser/app/build/libs/app.jar .
 
-CMD python3 -m proc_wrapper java -jar app.jar $TASK_COMMAND
+CMD python3 -m proc_wrapper
 
 FROM builder AS development
 ENTRYPOINT ["bash"]
