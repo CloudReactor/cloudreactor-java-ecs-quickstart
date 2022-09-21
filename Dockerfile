@@ -1,9 +1,55 @@
-FROM openjdk:17.0.2-slim-bullseye AS base
+FROM debian:buster-slim as base
+
+# The lines below are copied from the Dockerfile in the official
+# Amazon Corretto Dockerfile repository:
+# https://github.com/corretto/corretto-docker/blob/main/17/slim/debian/Dockerfile
+ARG version=17.0.4.9-1
+
+# In addition to installing the Amazon corretto, we also install
+# fontconfig. The folks who manage the docker hub's
+# official image library have found that font management
+# is a common usecase, and painpoint, and have
+# recommended that Java images include font support.
+#
+# See:
+#  https://github.com/docker-library/official-images/blob/master/test/tests/java-uimanager-font/container.java
+#
+# Slim:
+#   JLink is used (retaining all modules) to create a slimmer version of the JDK excluding man-pages, header files and debugging symbols - saving ~113MB.
+RUN set -ux \
+    && apt-get update \
+    && apt-get install -y --no-install-recommends \
+        curl ca-certificates gnupg software-properties-common fontconfig \
+    && curl -fL https://apt.corretto.aws/corretto.key | apt-key add - \
+    && add-apt-repository 'deb https://apt.corretto.aws stable main' \
+    && mkdir -p /usr/share/man/man1 \
+    && apt-get update \
+    && apt-get install -y java-17-amazon-corretto-jdk=1:$version binutils \
+    && jlink --add-modules "$(java --list-modules | sed -e 's/@[0-9].*$/,/' | tr -d \\n)" --no-man-pages --no-header-files --strip-debug --output /opt/corretto-slim \
+    && apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false \
+            curl gnupg software-properties-common binutils java-17-amazon-corretto-jdk=1:$version \
+    && mkdir -p /usr/lib/jvm \
+    && mv /opt/corretto-slim /usr/lib/jvm/java-17-amazon-corretto \
+    && jdk_tools="java keytool rmid rmiregistry javac jaotc jlink jmod jhsdb jar jarsigner javadoc javap jcmd jconsole jdb jdeps jdeprscan jimage jinfo jmap jps jrunscript jshell jstack jstat jstatd serialver" \
+    && priority=$(echo "1${version}" | sed "s/\(\.\|-\)//g") \
+    && for i in ${jdk_tools}; do \
+          update-alternatives --install /usr/bin/$i $i /usr/lib/jvm/java-17-amazon-corretto/bin/$i ${priority}; \
+       done
+
+ENV LANG C.UTF-8
+ENV JAVA_HOME=/usr/lib/jvm/java-17-amazon-corretto
+# End lines copies from https://github.com/corretto/corretto-docker/blob/main/17/slim/debian/Dockerfile
 
 LABEL maintainer="jtsay@cloudreactor.io"
 
-RUN apt-get update \
-  && apt-get install -y --no-install-recommends python3=3.9.2-3 python3-pip=20.3.4-4 \
+RUN set -ux \
+  && apt-get update \
+  && apt-get upgrade -y \
+  && apt-get install -y --no-install-recommends \
+  openssl \
+  libexpat1 \
+  ca-certificates \
+  wget \
   && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Run as non-root user for better security
@@ -12,22 +58,13 @@ USER appuser
 RUN mkdir /home/appuser/app
 WORKDIR /home/appuser/app
 
-# Output directly to the terminal to prevent logs from being lost
-# https://stackoverflow.com/questions/59812009/what-is-the-use-of-pythonunbuffered-in-docker-file
-ENV PYTHONUNBUFFERED 1
-
-# Don't write *.pyc files
-ENV PYTHONDONTWRITEBYTECODE 1
-#
-# Enable the fault handler for segfaults
-# https://docs.python.org/3/library/faulthandler.html
-ENV PYTHONFAULTHANDLER 1
-
-ENV PYTHONPATH /home/appuser/app
-
-COPY deploy_config/files/proc_wrapper-requirements.txt .
-RUN pip3 install --no-input --no-cache-dir -r proc_wrapper-requirements.txt
-RUN pip3 install --no-input --no-cache-dir cloudreactor-procwrapper==5.0.0
+# Use the standalone executable for x64/AMD64 Linux.
+# Unfortunately, it is an AppImage that needs to be extracted to
+# run in a container, since FUSE inside a container is problematic.
+RUN wget -nv https://github.com/CloudReactor/cloudreactor-procwrapper/raw/5.0/bin/nuitka/linux-amd64/5.0.0/proc_wrapper.bin -O proc_wrapper_app_image \
+  && chmod +x proc_wrapper_app_image \
+  && ./proc_wrapper_app_image --appimage-extract \
+  && rm ./proc_wrapper_app_image
 
 FROM base AS builder
 
@@ -37,7 +74,6 @@ COPY gradle ./gradle
 # Cache the download of the wrapper
 RUN ./gradlew --version
 
-#COPY gradle.properties .
 COPY build.gradle.kts .
 
 # Only download dependencies
@@ -52,7 +88,8 @@ FROM base AS release
 
 COPY --from=builder /home/appuser/app/build/libs/app.jar .
 
-CMD python3 -m proc_wrapper
+# ENTRYPOINT ["./proc_wrapper"]
+ENTRYPOINT ["squashfs-root/proc_wrapper.bin"]
 
 FROM builder AS development
 ENTRYPOINT ["bash"]

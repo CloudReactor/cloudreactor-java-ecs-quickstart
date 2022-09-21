@@ -6,8 +6,6 @@ x-common-base: &common-base
     - deploy_config/env/.env.dev
   environment: &dev-env
     DEPLOYMENT: development
-  volumes:
-    - .:/home/appuser/app
   profiles: ["dev"]
 
 x-dev-base: &dev-base
@@ -15,10 +13,15 @@ x-dev-base: &dev-base
   build:
     context: ./
     target: development
+  volumes:
+    - .:/home/appuser/app
   entrypoint: ./gradlew run
 
 x-deployed-base: &deployed-base
   <<: *common-base
+  build:
+    context: ./
+    target: release
   entrypoint: java -jar app.jar
 
 services:
