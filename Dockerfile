@@ -59,7 +59,7 @@ RUN mkdir /home/appuser/app
 WORKDIR /home/appuser/app
 
 # Use the standalone executable for x64/AMD64 Linux.
-RUN wget -nv https://github.com/CloudReactor/cloudreactor-procwrapper/raw/5.0.1/bin/nuitka/linux-amd64/5.0.1/proc_wrapper.bin
+RUN wget -nv https://github.com/CloudReactor/cloudreactor-procwrapper/raw/5.0.1/bin/nuitka/debian-amd64/5.0.1/proc_wrapper.bin
 RUN chmod +x proc_wrapper.bin
 
 FROM base AS builder
