@@ -17,8 +17,9 @@ It uses this tech for building and running the application:
 * Java 17
 * Built with [Gradle](https://gradle.org/) 7 with the build file written in Kotlin
 * Logging with [Log4J2](https://logging.apache.org/log4j/2.x/)
-* Deployed on a [Debian Buster](https://www.debian.org/releases/buster/) image using the 
-[Amazon Corretto JDK](https://aws.amazon.com/corretto/?filtered-posts.sort-by=item.additionalFields.createdDate&filtered-posts.sort-order=desc)
+* Based on Amazon's Docker image with [Amazon Corretto JDK](https://aws.amazon.com/corretto/?filtered-posts.sort-by=item.additionalFields.createdDate&filtered-posts.sort-order=desc)
+running on [Amazon Linux 2](https://aws.amazon.com/amazon-linux-2/). A [Dockerfile](Dockerfile-debian-amd64) for 
+a [Debian Buster](https://www.debian.org/releases/buster/) image using the Amazon Corretto JDK is also available.
 
 It has these features built-in:
 * Runs, tests, and deploys everything with Docker, no local java installation required
