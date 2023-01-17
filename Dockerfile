@@ -10,7 +10,7 @@ USER appuser
 RUN mkdir /home/appuser/app
 WORKDIR /home/appuser/app
 
-RUN wget -nv https://github.com/CloudReactor/cloudreactor-procwrapper/raw/5.0.1/bin/pyinstaller/al2/5.0.1/proc_wrapper.bin
+RUN wget -nv https://github.com/CloudReactor/cloudreactor-procwrapper/raw/5.0.2/bin/pyinstaller/al2/5.0.2/proc_wrapper.bin
 RUN chmod +x ./proc_wrapper.bin
 
 FROM base AS builder
